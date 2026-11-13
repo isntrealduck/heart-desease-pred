@@ -1,0 +1,13 @@
+.git
+.venv
+__pycache__
+.pytest_cache
+*.py[cod]
+/train.csv
+/test.csv
+/DATA_MANIFEST.json
+data/raw/
+data/splits/
+artifacts/
+predictions/
+reports/generated/

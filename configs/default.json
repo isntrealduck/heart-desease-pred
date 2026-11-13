@@ -1,0 +1,19 @@
+{
+  "data": {"train": "data/raw/train.csv", "test": "data/raw/test.csv", "target": "Heart Disease", "id": "id"},
+  "seed": 42,
+  "holdout_fraction": 0.2,
+  "folds": 3,
+  "threshold": 0.5,
+  "selection_metric": "roc_auc",
+  "positive_label": "Presence",
+  "negative_label": "Absence",
+  "numeric_features": ["Age", "BP", "Cholesterol", "Max HR", "ST depression", "Number of vessels fluro"],
+  "categorical_features": ["Sex", "Chest pain type", "FBS over 120", "EKG results", "Exercise angina", "Slope of ST", "Thallium"],
+  "models": {
+    "dummy": {},
+    "logistic": {"C": 1.0, "max_iter": 1000},
+    "hist_gradient_boosting": {"learning_rate": 0.1, "max_iter": 100, "max_leaf_nodes": 31, "l2_regularization": 0.0}
+  },
+  "threads": 1,
+  "splits_dir": "data/splits"
+}

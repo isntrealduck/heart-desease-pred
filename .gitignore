@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+.DS_Store
+*.py[cod]
+.venv/
+data/raw/
+data/splits/
+artifacts/
+reports/generated/
+predictions/
+/train.csv
+/test.csv
+/DATA_MANIFEST.json
