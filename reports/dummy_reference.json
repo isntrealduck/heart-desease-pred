@@ -1,0 +1,35 @@
+{
+  "evaluation": "development_cross_validation",
+  "model": "dummy",
+  "strategy": "prior",
+  "folds": 3,
+  "threshold": 0.5,
+  "development_rows": 504000,
+  "metrics": {
+    "roc_auc": {
+      "mean": 0.5,
+      "fold_sd": 0.0
+    },
+    "average_precision": {
+      "mean": 0.44833928571428566,
+      "fold_sd": 6.798699777552591e-17
+    },
+    "accuracy": {
+      "mean": 0.5516607142857143,
+      "fold_sd": 0.0
+    },
+    "precision": {
+      "mean": 0.0,
+      "fold_sd": 0.0
+    },
+    "recall": {
+      "mean": 0.0,
+      "fold_sd": 0.0
+    },
+    "f1": {
+      "mean": 0.0,
+      "fold_sd": 0.0
+    }
+  },
+  "note": "Unweighted fold means; sample SD (ddof=1), not a confidence interval. No pooled OOF ROC-AUC is reported."
+}

@@ -1,0 +1,74 @@
+{
+  "run_id": "20261113T211731398899Z",
+  "status": "completed",
+  "evaluation": "development_cross_validation",
+  "model": "logistic",
+  "strategy": null,
+  "feature_set": "original",
+  "configured_parameters": {
+    "C": 1.0,
+    "max_iter": 1000
+  },
+  "threshold": 0.5,
+  "positive_class": 1,
+  "threshold_rule": "probability_presence >= threshold",
+  "zero_division": 0,
+  "holdout_evaluated": false,
+  "test_csv_used": false,
+  "python": "3.12.16",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+  "machine": "x86_64",
+  "threads": 1,
+  "packages": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "joblib": "1.5.2",
+    "threadpoolctl": "3.8.0"
+  },
+  "code": {
+    "commit": "536a3490a57bd386184e7a4b20ba07618549ac5e",
+    "working_tree_dirty": null,
+    "requirements_lock_sha256": "af743cc2277dfebdfcdd1d9323b04fb9b8a961fb7d252a85e19327d9f94f7025",
+    "source_sha256": {
+      "__init__.py": "25652326d7b1225b2f4f4115f5bb8736104c13fb3f624147f300cab3f693c8f5",
+      "audit.py": "88f1e9a6c8bd45f42c66f220f0e552c2463cee6c1a85948e102cd9fa0c016442",
+      "baseline.py": "f6ece7305eebaf64182f43455fc62427b87dc367758f119bc21af483dd4e4e62",
+      "preprocess.py": "cc7bc83a2eba87d9f914bdf09e9a28725e8a7cee5b32c111b078fce0dca4744b",
+      "split.py": "c6ff57b6fdbd95e3dabfb0ea4b74fdbd9fcad7291d997b58d1c735779b6e0f4b"
+    }
+  },
+  "config_sha256": "20c6487c41611150e72fcfb2329ad90548508957510332c47fac38846cc9d89a",
+  "train_sha256": "b462c43a8dfe19a8a6966038f590d8e15a9abed5fc9479f3ae5d99077b9855dc",
+  "membership_sha256": "60c42b8363207eb795ab5f4248ade0757d5d6f871548406dc637402ded598fd1",
+  "split_metadata": {
+    "source_sha256": "b462c43a8dfe19a8a6966038f590d8e15a9abed5fc9479f3ae5d99077b9855dc",
+    "protocol_sha256": "6ae35e795e99f744451b005c1875ec9622b19d4f5d31ab03b5ff2450a0e654fb",
+    "membership_sha256": "60c42b8363207eb795ab5f4248ade0757d5d6f871548406dc637402ded598fd1"
+  },
+  "split_created": false,
+  "development_rows": 504000,
+  "holdout_rows_excluded": 126000,
+  "final_fit_warnings": [],
+  "final_fit_convergence_warning": false,
+  "resolved_model_parameters": {
+    "C": 1.0,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": null,
+    "max_iter": 1000,
+    "multi_class": "deprecated",
+    "n_jobs": null,
+    "penalty": "l2",
+    "random_state": 42,
+    "solver": "lbfgs",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "final_fit_solver_iterations": 15,
+  "pipeline_fit_partition": "development_only",
+  "elapsed_seconds": 20.266027077999993
+}

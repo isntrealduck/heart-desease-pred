@@ -17,7 +17,7 @@
 
 ## Implementation and data care
 
-- Docker is required for setup, training, evaluation, prediction, and tests. This overrides conflicting Docker-optional wording in `PROJECT_PLAN.md`. Follow the README for exact tested setup commands; currently only setup, audit, split, and synthetic test commands are implemented.
+- Docker is required for setup, training, evaluation, prediction, and tests. This overrides conflicting Docker-optional wording in `PROJECT_PLAN.md`. Follow the README for tested commands. Setup, audit, split, synthetic tests, and development-only dummy/logistic baselines are implemented; final holdout evaluation and test-file prediction are not. Use `python -m heart_ml.baseline --model dummy` or `--model logistic` for the shared original-feature workflow.
 - Python 3.12 is the plan's proposed starting version, not a verified compatibility claim. Verify dependencies and Docker build/run behavior before calling commands tested; document exact tested commands in the README when implemented.
 - Explain preprocessing and metric choices in the README. Use comments/docstrings for non-obvious logic, not to restate code.
 - Add small synthetic tests for split non-overlap, schema validation, and prediction shape/range. Routine tests should not require downloaded data or full expensive searches.

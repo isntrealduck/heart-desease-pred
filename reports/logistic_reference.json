@@ -1,0 +1,40 @@
+{
+  "evaluation": "development_cross_validation",
+  "model": "logistic",
+  "strategy": null,
+  "feature_set": "original",
+  "configured_parameters": {
+    "C": 1.0,
+    "max_iter": 1000
+  },
+  "folds": 3,
+  "threshold": 0.5,
+  "development_rows": 504000,
+  "metrics": {
+    "roc_auc": {
+      "mean": 0.9524703076304153,
+      "fold_sd": 0.0003830582162451907
+    },
+    "average_precision": {
+      "mean": 0.9453061003823073,
+      "fold_sd": 0.0002744087442942743
+    },
+    "accuracy": {
+      "mean": 0.8849662698412698,
+      "fold_sd": 0.0009060597938117968
+    },
+    "precision": {
+      "mean": 0.8811834660774144,
+      "fold_sd": 0.000947209306137732
+    },
+    "recall": {
+      "mean": 0.8592866973796595,
+      "fold_sd": 0.0014020606269871396
+    },
+    "f1": {
+      "mean": 0.8700970898582686,
+      "fold_sd": 0.0010609751414213052
+    }
+  },
+  "note": "Unweighted fold means; sample SD (ddof=1), not a confidence interval. No pooled OOF ROC-AUC is reported."
+}
