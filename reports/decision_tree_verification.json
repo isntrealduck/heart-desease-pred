@@ -1,0 +1,19 @@
+{
+  "metric_summaries_identical": true,
+  "prediction_bytes_identical": true,
+  "reference_predictions_sha256": "3769ca1ec5874ea5cee864ee19e282774516bc884b7b3152eaaa0c7f1999a1c3",
+  "repeat_predictions_sha256": "3769ca1ec5874ea5cee864ee19e282774516bc884b7b3152eaaa0c7f1999a1c3",
+  "metrics_and_confusion_counts_recomputed_from_saved_oof_predictions": true,
+  "shared_data_folds_threshold_packages_threads_match_logistic": true,
+  "saved_membership_sha256_unchanged": "60c42b8363207eb795ab5f4248ade0757d5d6f871548406dc637402ded598fd1",
+  "selected_candidate_verified": 7,
+  "development_fitted_tree_depth": 12,
+  "development_fitted_tree_leaves": 1137,
+  "synthetic_tests_passed": 39,
+  "holdout_evaluated": false,
+  "test_csv_used": false,
+  "reference_directory": "reports/generated/decision-tree-reference",
+  "repeat_directory": "reports/generated/decision-tree-repeat",
+  "repeat_run_id": "20261114T173518695026Z",
+  "repeatability_scope": "Fresh containers in the same locked linux/amd64 environment; not clean-clone or cross-platform verification."
+}

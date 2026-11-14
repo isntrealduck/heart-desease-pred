@@ -94,13 +94,15 @@ The dummy model tests whether features add predictive value. Logistic regression
 
 Keep exploration in a notebook and reusable code in the package. Restart and run all notebook cells before submission. Training must work without opening the notebook.
 
-## 7. Build a stronger model and run a bounded comparison - friend leads
+## 7. Compare course-covered tree models - split between teammates
 
-Use `HistGradientBoostingClassifier`: it learns nonlinear relationships/interactions and is an efficient option for large tabular datasets. A simple initial pipeline can share the baseline preprocessing with dense one-hot output; there are few categories here. Native categorical support can be a later evaluated improvement.
+The team chose a standalone decision tree (you lead) and AdaBoost (friend leads), alongside the existing dummy and logistic baselines, so both can explain the algorithms covered in the course. HistGradientBoosting remains an optional existing constructor rather than a required experiment.
 
-Tune a small recorded search, for example at most 8 configurations across learning rate, leaf count, and L2 regularization, with an explicit iteration limit and seed. Tune logistic regularization on a small grid too. Reported model comparisons must use the same full development pool and folds.
+The decision-tree study uses the original features, Gini splits, seed 42, and eight configurations: maximum depth in {3, 5, 8, 12} crossed with minimum leaf size in {50, 200}. Select the highest mean development CV ROC-AUC; exact ties prefer shallower depth and then larger minimum leaf size. Keep threshold 0.5 and all saved folds fixed. Save every candidate's scores and the complete selected development-trained pipeline.
 
-A fixed development-only sample is useful for debugging; label its results provisional. Measure full-run runtime and approximate/peak memory on your hardware. Avoid broad searches and additional model families until the core workflow works. Keep weak results, convergence warnings, and failed runs in the experiment log.
+Your friend should evaluate a small recorded AdaBoost search with the same data, folds, label mapping, threshold and metrics. The best standalone tree need not be the weak learner used inside AdaBoost; small trees are appropriate starting weak learners. Agree on the candidate grid before examining scores. Logistic settings remain the existing fixed reference unless a separate tuning experiment is explicitly recorded.
+
+A fixed development-only sample is useful for debugging; label its results provisional. Avoid broad searches and further model families until the comparison works. Keep weak results, warnings and failed runs. Because the same folds choose hyperparameters, development scores are selection estimates; reserve the untouched holdout for the final frozen model.
 
 ## 8. Evaluate and explain the selected pipeline - together
 

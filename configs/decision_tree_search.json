@@ -1,0 +1,15 @@
+{
+  "max_depth": [
+    3,
+    5,
+    8,
+    12
+  ],
+  "min_samples_leaf": [
+    50,
+    200
+  ],
+  "criterion": "gini",
+  "selection_metric": "roc_auc",
+  "tie_break": "shallower depth, then larger minimum leaf size"
+}

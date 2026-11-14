@@ -1,6 +1,6 @@
 # Heart disease classification project
 
-Implemented: input audit, saved ID-based split, shared pipeline constructors, tested dummy/logistic baselines, and a bounded development-only feature-engineering study. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
+Implemented: input audit, saved ID-based split, shared pipeline constructors, tested dummy/logistic baselines, and a bounded development-only feature-engineering study, and a decision-tree search. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
 
 ## Data and limitations
 
@@ -12,7 +12,7 @@ Audit allows missing predictors (reported per column for later imputation), but 
 
 ## Docker setup and tested commands
 
-Docker is required. The initial setup was documented as tested on linux/arm64. Both baselines were verified on 14 November 2026 using Docker Engine 29.9.3, Python 3.12.16, and linux/amd64 under WSL2 on Windows. The updated image built successfully; the feature-engineering extension passes all 36 synthetic tests. Repeat real-data runs produced identical metric summaries and byte-identical development predictions for each model. Lock versions are explicit. Run from the repository root; the braced volume syntax works in PowerShell and POSIX shells:
+Docker is required. The initial setup was documented as tested on linux/arm64. Both baselines were verified on 14 November 2026 using Docker Engine 29.9.3, Python 3.12.16, and linux/amd64 under WSL2 on Windows. The updated image built successfully; the current project passes all 39 synthetic tests. Repeat real-data runs produced identical metric summaries and byte-identical development predictions for each model. Lock versions are explicit. Run from the repository root; the braced volume syntax works in PowerShell and POSIX shells:
 
 ```sh
 docker build -t heart-ml .
@@ -118,6 +118,34 @@ docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model lo
 
 All 36 synthetic tests passed. The original control reproduced the published logistic predictions exactly, and a fresh-container Age-squared repeat produced identical summaries and prediction bytes. The final holdout and test.csv remain unevaluated. Feature-set selection on development CV is not an independent final performance estimate.
 
+## Decision tree: bounded development search
+
+Train and compare eight trees on the same saved development folds:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.tree_experiment --config configs/default.json --plan configs/decision_tree_search.json
+```
+
+The plan crosses maximum depths 3, 5, 8 and 12 with minimum leaf sizes 50 and 200. It is saved before training. Selection uses highest mean CV ROC-AUC; exact ties prefer shallower depth, then larger minimum leaf size. The selected folds are rerun to check repeatability, and the complete pipeline is fitted on development rows only. No final holdout or test-file evaluation occurs.
+
+The tree learns feature thresholds and interactions using greedy Gini-impurity reduction. Depth and leaf-size limits control complexity. Numeric median imputation and categorical mode imputation/one-hot encoding are fitted inside each fold. No numeric scaling or derived features are used. See [scikit-learn's decision-tree guide](https://scikit-learn.org/1.7/modules/tree.html).
+
+Each new output directory under `reports/generated/decision-tree/` contains the frozen plan/config, `search_results.csv` (all candidate summaries), `search_folds.csv` (all fold metrics/confusion counts), `selection.json`, and `search_metadata.json`. The `selected/` folder contains the chosen settings, six metric summaries, per-fold confusion counts, out-of-fold predictions, run metadata, and `decision_tree_pipeline.joblib`. Existing output folders are refused.
+
+Repeat just a selected tree with its saved configuration:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model decision_tree --config reports/generated/decision-tree-reference/selected/config.json
+```
+
+That path is from the local reference run; for another search use its own selected/config.json. Running `--model decision_tree` with configs/default.json instead uses the initial depth-8/leaf-50 preset, not necessarily the search winner. All thresholded scores use positive probability >= 0.5, including exact ties; calling the estimator's predict method can handle exact ties differently.
+
+Measured reference: maximum depth 12, minimum leaf size 200, mean CV ROC-AUC **0.949041**, AP **0.939705**, accuracy **88.0242%**, precision **86.9890%**, recall **86.1783%**, and F1 **0.865816**. Logistic remains stronger by ROC-AUC (0.952470), accuracy and F1; tree recall is slightly higher at the shared threshold. All 39 tests passed. A fresh-container repeat produced identical summaries and byte-identical development predictions; all fold metrics and confusion counts were checked against the saved OOF predictions.
+
+See the [decision-tree report](reports/decision_tree.md), [full-precision summary](reports/decision_tree_reference.json), [all candidate results](reports/decision_tree_search_results.csv), and [verification evidence](reports/decision_tree_verification.json). To reproduce the selected settings without searching, use `--model decision_tree --config reports/decision_tree_selected_config.json` with the shared baseline command.
+
+The final report must label these scores development CV: eight configurations were compared on these folds, whereas logistic regression used fixed settings. These scores are not an independent final performance estimate.
+
 ## Status and next steps
 
-Confirm data provenance/independence assumptions. The bounded feature study retains the original features under its frozen rule; use that logistic baseline for the boosting comparison on the same saved folds. Final model selection, holdout evaluation, test prediction, a full-project reproduction command, and clean-clone release verification remain future work.
+Confirm data provenance/independence assumptions. The bounded feature study retains the original features under its frozen rule; compare that logistic baseline with the decision tree and the teammate-led AdaBoost experiment on the same saved folds. Final model selection, holdout evaluation, test prediction, a full-project reproduction command, and clean-clone release verification remain future work.

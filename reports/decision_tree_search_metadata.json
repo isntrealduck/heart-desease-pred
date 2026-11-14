@@ -1,0 +1,28 @@
+{
+  "status": "completed",
+  "evaluation": "development_cross_validation",
+  "holdout_evaluated": false,
+  "test_csv_used": false,
+  "code": {
+    "commit": "3b235dd543096d045804b3ae2cf21b7565b54963",
+    "working_tree_dirty": null,
+    "requirements_lock_sha256": "af743cc2277dfebdfcdd1d9323b04fb9b8a961fb7d252a85e19327d9f94f7025",
+    "source_sha256": {
+      "__init__.py": "25652326d7b1225b2f4f4115f5bb8736104c13fb3f624147f300cab3f693c8f5",
+      "audit.py": "88f1e9a6c8bd45f42c66f220f0e552c2463cee6c1a85948e102cd9fa0c016442",
+      "baseline.py": "53189b1d24fccccd98c9a9a39b2b1f47c72f87b05d5f0889179e7b0233be0cd2",
+      "feature_experiments.py": "df88046be0adacdf14e78d8aa3898e2399528fe8568afc3aa7eaedf0ec03655e",
+      "features.py": "0fc880dc7c30e0c9047db15c091b36dbcd04efdea0a30b211333842926cc6663",
+      "preprocess.py": "8b4bcae0157e0b7770033a56a285bad654dd96284e5db4730b43e7e97d557681",
+      "split.py": "c6ff57b6fdbd95e3dabfb0ea4b74fdbd9fcad7291d997b58d1c735779b6e0f4b",
+      "tree_experiment.py": "f06867d2a71c6d53c1e2acbca44fab9544ee9bef1908b6c0d69c7a87b778536e"
+    }
+  },
+  "plan_sha256": "412303dae38d8dafb7111d66f33ad1b8716c0c74b47d24e947c4eef17f52ed6f",
+  "config_sha256": "b789fe110df26b9f63b519d6db12f0b3be2a770a6f3d7d0f1761db50f2082c5c",
+  "train_sha256": "b462c43a8dfe19a8a6966038f590d8e15a9abed5fc9479f3ae5d99077b9855dc",
+  "membership_sha256": "60c42b8363207eb795ab5f4248ade0757d5d6f871548406dc637402ded598fd1",
+  "development_rows": 504000,
+  "holdout_rows_excluded": 126000,
+  "selected_candidate": 7
+}

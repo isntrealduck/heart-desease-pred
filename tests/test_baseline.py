@@ -89,8 +89,9 @@ def test_no_holdout_or_validation_rows_reach_training(monkeypatch, config, frame
         assert holdout.isdisjoint(trained | predicted)
 
 
-@pytest.mark.parametrize("model_name", ["dummy", "logistic"])
+@pytest.mark.parametrize("model_name", ["dummy", "logistic", "decision_tree"])
 def test_holdout_changes_cannot_change_development_metrics(config, frame, model_name):
+    config["models"]["decision_tree"]["min_samples_leaf"] = 2
     membership = create_membership(frame, config)
     original = baseline.development_rows(frame, membership, config)
     original_folds, original_predictions = baseline.evaluate_model(original, config, model_name)

@@ -5,6 +5,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
@@ -44,6 +45,8 @@ def build_pipeline(model_name, config, feature_set="original"):
     ])
     if model_name == "logistic":
         model = LogisticRegression(**params, random_state=config["seed"])
+    elif model_name == "decision_tree":
+        model = DecisionTreeClassifier(**params, random_state=config["seed"])
     elif model_name == "hist_gradient_boosting":
         model = HistGradientBoostingClassifier(**params, random_state=config["seed"])
     else:

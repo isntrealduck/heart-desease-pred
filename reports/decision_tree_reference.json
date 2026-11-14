@@ -1,0 +1,42 @@
+{
+  "evaluation": "development_cross_validation",
+  "model": "decision_tree",
+  "strategy": null,
+  "feature_set": "original",
+  "feature_definitions": [],
+  "configured_parameters": {
+    "criterion": "gini",
+    "max_depth": 12,
+    "min_samples_leaf": 200
+  },
+  "folds": 3,
+  "threshold": 0.5,
+  "development_rows": 504000,
+  "metrics": {
+    "roc_auc": {
+      "mean": 0.9490406720091301,
+      "fold_sd": 0.0003518114844207216
+    },
+    "average_precision": {
+      "mean": 0.9397052727006013,
+      "fold_sd": 0.0003155830571663159
+    },
+    "accuracy": {
+      "mean": 0.8802420634920636,
+      "fold_sd": 0.0010773371033784814
+    },
+    "precision": {
+      "mean": 0.8698902134963028,
+      "fold_sd": 0.0006784948668703502
+    },
+    "recall": {
+      "mean": 0.8617826812354235,
+      "fold_sd": 0.0024794156184781884
+    },
+    "f1": {
+      "mean": 0.8658163305381165,
+      "fold_sd": 0.0013676371892933571
+    }
+  },
+  "note": "Unweighted fold means; sample SD (ddof=1), not a confidence interval. No pooled OOF ROC-AUC is reported."
+}

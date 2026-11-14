@@ -28,6 +28,7 @@ from .preprocess import build_pipeline
 from .features import FEATURE_DEFINITIONS, FEATURE_SETS
 from .split import encode_labels, write_or_verify_splits
 
+SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree")
 METRICS = ("roc_auc", "average_precision", "accuracy", "precision", "recall", "f1")
 
 
@@ -66,8 +67,8 @@ def evaluate_model(development, config, model_name, feature_set="original"):
     Each fold fits a fresh complete pipeline, including learned preprocessing.
     Probabilities, rather than thresholded labels, are used for ROC-AUC/AP.
     """
-    if model_name not in {"dummy", "logistic"}:
-        raise ValueError("Supported baselines are dummy and logistic")
+    if model_name not in SUPPORTED_MODELS:
+        raise ValueError("Supported models are dummy, logistic and decision_tree")
     if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
         raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     if not development["partition"].eq("development").all():
@@ -183,8 +184,8 @@ def write_json(path, value):
 def run_baseline(config, model_name="dummy", output_dir=None, feature_set="original"):
     """Verify/create saved splits and save a reproducible development-only run."""
     validate_config(config)
-    if model_name not in {"dummy", "logistic"}:
-        raise ValueError("Supported baselines are dummy and logistic")
+    if model_name not in SUPPORTED_MODELS:
+        raise ValueError("Supported models are dummy, logistic and decision_tree")
     if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
         raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     threads = config.get("threads", 1)
@@ -274,7 +275,7 @@ def run_dummy_baseline(config, output_dir=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", choices=("dummy", "logistic"), default="dummy")
+    parser.add_argument("--model", choices=SUPPORTED_MODELS, default="dummy")
     parser.add_argument("--feature-set", choices=FEATURE_SETS, default="original")
     parser.add_argument("--config", default="configs/default.json")
     parser.add_argument("--output-dir", help="New output directory; existing directories are never overwritten")
