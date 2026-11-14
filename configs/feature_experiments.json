@@ -1,0 +1,16 @@
+{
+  "feature_sets": [
+    "original",
+    "age_squared",
+    "age_st_interaction",
+    "combined"
+  ],
+  "minimum_mean_roc_auc_gain": 0.0005,
+  "require_positive_gain_in_every_fold": true,
+  "rationale": {
+    "age_squared": "Allow curvature in the age association with log-odds.",
+    "age_st_interaction": "Allow the ST-depression association to vary with age.",
+    "combined": "Check both predeclared hypotheses together."
+  },
+  "selection_note": "Development-only comparison; no significance or clinical-utility claim."
+}

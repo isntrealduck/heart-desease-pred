@@ -1,6 +1,6 @@
 # Heart disease classification project
 
-Implemented: input audit, saved ID-based split, shared pipeline constructors, and tested development-only dummy and original-feature logistic-regression experiments. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
+Implemented: input audit, saved ID-based split, shared pipeline constructors, tested dummy/logistic baselines, and a bounded development-only feature-engineering study. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
 
 ## Data and limitations
 
@@ -12,7 +12,7 @@ Audit allows missing predictors (reported per column for later imputation), but 
 
 ## Docker setup and tested commands
 
-Docker is required. The initial setup was documented as tested on linux/arm64. Both baselines were verified on 14 November 2026 using Docker Engine 29.9.3, Python 3.12.16, and linux/amd64 under WSL2 on Windows. The updated image built successfully and all 24 synthetic tests passed. Repeat real-data runs produced identical metric summaries and byte-identical development predictions for each model. Lock versions are explicit. Run from the repository root; the braced volume syntax works in PowerShell and POSIX shells:
+Docker is required. The initial setup was documented as tested on linux/arm64. Both baselines were verified on 14 November 2026 using Docker Engine 29.9.3, Python 3.12.16, and linux/amd64 under WSL2 on Windows. The updated image built successfully; the feature-engineering extension passes all 36 synthetic tests. Repeat real-data runs produced identical metric summaries and byte-identical development predictions for each model. Lock versions are explicit. Run from the repository root; the braced volume syntax works in PowerShell and POSIX shells:
 
 ```sh
 docker build -t heart-ml .
@@ -85,6 +85,39 @@ The measured logistic reference used 504,000 development rows and excluded all 1
 
 See the [comparison report](reports/logistic_baseline.md), [full-precision logistic summary](reports/logistic_reference.json), and [run metadata](reports/logistic_run_metadata.json). The comparison verifies matching training-data, configuration, and split hashes for dummy and logistic. These are development CV results, not final holdout scores or external clinical validation. The saved pipeline is development-trained and has no final holdout score.
 
+## Feature-engineering experiments
+
+Run the fixed comparison with the original logistic classifier settings:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.feature_experiments --config configs/default.json --plan configs/feature_experiments.json
+```
+
+The plan compares original features, Age squared, Age times ST depression, and both additions together. These are limited hypotheses about curvature and interaction in the log-odds. Numeric median imputation is fitted inside each training fold, then the new terms are created from the imputed values and scaled inside that fold. Original raw feature roles and categorical handling remain fixed; no raw CSVs are changed. C, solver, seed, threshold, saved split, and CV folds remain unchanged.
+
+The plan is saved before candidate scores are examined. Retaining an engineered variant requires mean ROC-AUC gain of at least 0.0005, positive gain in every fold, and no convergence warnings. This is a predeclared practical rule, not a significance test. Exploration uses development rows only; its bins are descriptive and never model inputs.
+
+Measured mean development ROC-AUC:
+
+| Variant | ROC-AUC | Gain over original |
+| --- | ---: | ---: |
+| Original | 0.952470 | 0.000000 |
+| Age squared | 0.952480 | +0.000010 |
+| Age times ST depression | 0.952472 | +0.000002 |
+| Both additions | 0.952479 | +0.000009 |
+
+**Retain the original features under the predeclared rule.** All fits converged, but none met the required gain. These outcomes do not imply that every possible feature-engineering approach is ineffective. All results and paired fold changes are retained in the [feature report](reports/feature_engineering.md) and [full reference JSON](reports/feature_engineering_reference.json), with [exploration values](reports/feature_engineering_eda.json) and [verification evidence](reports/feature_engineering_verification.json).
+
+Outputs go to a new directory under reports/generated/feature-engineering/. Each variant retains its own metrics, development predictions, warnings, settings, metadata, and full development-trained pipeline. The suite also saves the exploration/comparison figures and report. Existing output directories are never overwritten.
+
+For a single reproducible variant:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model logistic --feature-set age_squared --config configs/default.json
+```
+
+All 36 synthetic tests passed. The original control reproduced the published logistic predictions exactly, and a fresh-container Age-squared repeat produced identical summaries and prediction bytes. The final holdout and test.csv remain unevaluated. Feature-set selection on development CV is not an independent final performance estimate.
+
 ## Status and next steps
 
-Confirm data provenance/independence assumptions, then use the original-feature logistic results as the reference for feature-engineering experiments and boosting comparison on the same saved folds. Final model selection, holdout evaluation, test prediction, a full-project reproduction command, and clean-clone release verification remain future work.
+Confirm data provenance/independence assumptions. The bounded feature study retains the original features under its frozen rule; use that logistic baseline for the boosting comparison on the same saved folds. Final model selection, holdout evaluation, test prediction, a full-project reproduction command, and clean-clone release verification remain future work.

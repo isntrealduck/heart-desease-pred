@@ -1,6 +1,6 @@
 # Heart disease classification: two-person project plan
 
-This is an implementation plan, not a trained model. The accompanying README is a draft to complete as the project is built. No GitHub repository has been created or published.
+This document records the project plan. See README.md for implemented commands, current status, and measured results. The shared repository is https://github.com/isntrealduck/heart-desease-pred.
 
 ## 1. Agree on the question and definition of done - together
 
@@ -177,7 +177,7 @@ The README must include actual prerequisites, data access/hashes, exact setup/tr
 6. Fix missing dependencies, absolute paths, missing files, and unclear instructions; repeat affected checks.
 7. Tag the verified commit `v1.0.0`, retain small reference outputs in Git, and provide repository/tag plus data/artifact access instructions.
 
-State which platforms were tested. Docker is an optional additional snapshot; start with a tested clean virtual environment and locked dependencies.
+State which platforms were tested. Use the required Docker workflow and locked dependencies for setup, experiments, prediction, and tests.
 
 ## Recommended division of work
 

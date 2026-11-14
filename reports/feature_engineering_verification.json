@@ -1,0 +1,12 @@
+{
+    "synthetic_tests_passed":  36,
+    "synthetic_test_seconds":  12.73,
+    "original_control_matches_published_prediction_sha256":  "7ac4d6342c4f43e0f29f5a374f8bb54d508fd28eefe4c2e8682e05b7e19f96cb",
+    "repeated_feature_set":  "age_squared",
+    "repeat_summary_identical":  true,
+    "repeat_prediction_sha256":  "eed1e80e282bfd74f9a22a973ed1f146a59e4ee5e257c5c57e9bf725e303f2f6",
+    "docker_image_id":  "sha256:90cd6faf343cbe177d117b5fbfca5a64c8b394729784dbc75d782f46b6f007f7",
+    "holdout_evaluated":  false,
+    "test_csv_used":  false,
+    "scope":  "Same tested Docker image and saved split; no cross-platform or release clean-clone claim."
+}

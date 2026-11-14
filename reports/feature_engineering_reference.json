@@ -1,0 +1,162 @@
+{
+  "status": "completed",
+  "plan": {
+    "feature_sets": [
+      "original",
+      "age_squared",
+      "age_st_interaction",
+      "combined"
+    ],
+    "minimum_mean_roc_auc_gain": 0.0005,
+    "require_positive_gain_in_every_fold": true,
+    "rationale": {
+      "age_squared": "Allow curvature in the age association with log-odds.",
+      "age_st_interaction": "Allow the ST-depression association to vary with age.",
+      "combined": "Check both predeclared hypotheses together."
+    },
+    "selection_note": "Development-only comparison; no significance or clinical-utility claim."
+  },
+  "code": {
+    "commit": "e9d4302c5cfd53a91c74881a07364a211c77dcaf",
+    "working_tree_dirty": null,
+    "requirements_lock_sha256": "af743cc2277dfebdfcdd1d9323b04fb9b8a961fb7d252a85e19327d9f94f7025",
+    "source_sha256": {
+      "__init__.py": "25652326d7b1225b2f4f4115f5bb8736104c13fb3f624147f300cab3f693c8f5",
+      "audit.py": "88f1e9a6c8bd45f42c66f220f0e552c2463cee6c1a85948e102cd9fa0c016442",
+      "baseline.py": "eb53c4d19073cb25b888540f86d78649a2a2154707f336ae406b7a5429b1bf62",
+      "feature_experiments.py": "df88046be0adacdf14e78d8aa3898e2399528fe8568afc3aa7eaedf0ec03655e",
+      "features.py": "0fc880dc7c30e0c9047db15c091b36dbcd04efdea0a30b211333842926cc6663",
+      "preprocess.py": "d46630233588470162687f54b81c4beec32c18c7c8c958b9d1546d2f88c972c1",
+      "split.py": "c6ff57b6fdbd95e3dabfb0ea4b74fdbd9fcad7291d997b58d1c735779b6e0f4b"
+    }
+  },
+  "holdout_evaluated": false,
+  "test_csv_used": false,
+  "data": {
+    "train_sha256": "b462c43a8dfe19a8a6966038f590d8e15a9abed5fc9479f3ae5d99077b9855dc",
+    "membership_sha256": "60c42b8363207eb795ab5f4248ade0757d5d6f871548406dc637402ded598fd1",
+    "development_rows": 504000,
+    "holdout_rows_excluded": 126000
+  },
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "machine": "x86_64",
+    "threads": 1,
+    "packages": {
+      "numpy": "2.2.6",
+      "pandas": "2.3.3",
+      "scikit-learn": "1.7.2",
+      "joblib": "1.5.2",
+      "threadpoolctl": "3.8.0"
+    }
+  },
+  "selection": {
+    "recommended_feature_set": "original",
+    "highest_mean_roc_auc_feature_set": "age_squared",
+    "minimum_mean_roc_auc_gain": 0.0005,
+    "require_positive_gain_in_every_fold": true,
+    "exclude_convergence_warnings": true,
+    "eligible_engineered_variants": [],
+    "scope": "Development recommendation only; no final holdout evaluation or significance claim."
+  },
+  "comparison": [
+    {
+      "feature_set": "original",
+      "definitions": [],
+      "added_features": 0,
+      "status": "completed",
+      "roc_auc": 0.9524703076304153,
+      "average_precision": 0.9453061003823073,
+      "accuracy": 0.8849662698412698,
+      "precision": 0.8811834660774144,
+      "recall": 0.8592866973796595,
+      "f1": 0.8700970898582686,
+      "roc_auc_fold_sd": 0.0003830582162451907,
+      "mean_delta_roc_auc": 0.0,
+      "fold_roc_auc_gains": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "all_folds_improved": false,
+      "convergence_warnings": 0,
+      "elapsed_seconds": 20.167676483000008
+    },
+    {
+      "feature_set": "age_squared",
+      "definitions": [
+        "Age_squared = Age ** 2"
+      ],
+      "added_features": 1,
+      "status": "completed",
+      "roc_auc": 0.9524802429161016,
+      "average_precision": 0.9453290500133814,
+      "accuracy": 0.8850396825396825,
+      "precision": 0.8812174010800935,
+      "recall": 0.8594327389882414,
+      "f1": 0.8701884940304389,
+      "roc_auc_fold_sd": 0.00038641903757794953,
+      "mean_delta_roc_auc": 9.935285686120862e-06,
+      "fold_roc_auc_gains": [
+        7.836061745036815e-06,
+        8.134027201345262e-06,
+        1.3835768111980506e-05
+      ],
+      "all_folds_improved": true,
+      "convergence_warnings": 0,
+      "elapsed_seconds": 23.88252280400002
+    },
+    {
+      "feature_set": "age_st_interaction",
+      "definitions": [
+        "Age_x_ST_depression = Age * ST depression"
+      ],
+      "added_features": 1,
+      "status": "completed",
+      "roc_auc": 0.9524718584355639,
+      "average_precision": 0.9453088739743906,
+      "accuracy": 0.8849662698412698,
+      "precision": 0.8811664089356768,
+      "recall": 0.8593088248961114,
+      "f1": 0.8701000381650618,
+      "roc_auc_fold_sd": 0.00038567323363184147,
+      "mean_delta_roc_auc": 1.5508051485572476e-06,
+      "fold_roc_auc_gains": [
+        -3.7900346533392693e-06,
+        4.61330747936195e-06,
+        3.829142619649062e-06
+      ],
+      "all_folds_improved": false,
+      "convergence_warnings": 0,
+      "elapsed_seconds": 25.554055304000002
+    },
+    {
+      "feature_set": "combined",
+      "definitions": [
+        "Age_squared = Age ** 2",
+        "Age_x_ST_depression = Age * ST depression"
+      ],
+      "added_features": 2,
+      "status": "completed",
+      "roc_auc": 0.9524791835629526,
+      "average_precision": 0.945324840533117,
+      "accuracy": 0.8850376984126984,
+      "precision": 0.881223875178161,
+      "recall": 0.8594194624783703,
+      "f1": 0.8701848149498342,
+      "roc_auc_fold_sd": 0.00038351256917049245,
+      "mean_delta_roc_auc": 8.875932537140882e-06,
+      "fold_roc_auc_gains": [
+        8.248342794781038e-06,
+        9.044254369428018e-06,
+        9.335200447213587e-06
+      ],
+      "all_folds_improved": true,
+      "convergence_warnings": 0,
+      "elapsed_seconds": 29.773263601999986
+    }
+  ],
+  "elapsed_seconds": 114.13255750400003,
+  "generated_directory": "reports/generated/feature-engineering-reference"
+}
