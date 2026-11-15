@@ -173,9 +173,35 @@ The optional four-candidate search is explicitly opt-in:
 docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.random_forest_experiment --config configs/default.json --plan configs/random_forest_search.json
 ```
 
-It crosses depths 8/12 with leaf sizes 50/200 (100 trees fixed), selects mean development-fold ROC-AUC, and breaks exact ties toward shallower depth then larger leaves. CV evaluates four candidates (12 forest fits); selected baseline output repeats three folds and fits once on development data (4 more fits), for 16 forest fits total. Forests can be expensive and artifacts larger than the other models; the search is not run automatically. Outputs are development-only; no holdout is evaluated and test.csv is not read. No performance result is claimed until deliberately run.
+It crosses depths 8/12 with leaf sizes 50/200 (100 trees fixed), selects mean development-fold ROC-AUC, and breaks exact ties toward shallower depth then larger leaves. CV evaluates four candidates (12 forest fits); selected baseline output repeats three folds and fits once on development data (4 more fits), for 16 forest fits total. Forests can be expensive and artifacts larger than the other models; the search is not run automatically. Outputs are development-only; no holdout is evaluated and test.csv is not read. The fixed-default baseline has been run; see the comparison below. The optional search has not been run.
 
 Baseline outputs default to `reports/generated/random_forest/<run-id>/`; search outputs default to `reports/generated/random-forest/<run-id>/`, with the selected run under `selected/`. Explicit output directories must be new. Search metadata records plan/config hashes and elapsed time; fold result rows retain warning notes.
+
+## Development CV comparison
+
+All results below are unweighted means across the same three saved development folds, using threshold 0.5 for thresholded metrics. Accuracy, precision, and recall are percentages; other metrics are on the 0–1 scale. Bold marks the best displayed value in each column. The tree row is the winner of the bounded eight-candidate search; AdaBoost and Random Forest are fixed-default baselines, not tuned results.
+
+| Model | ROC-AUC | Average precision | Accuracy | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Dummy | 0.500000 | 0.448339 | 55.1661% | 0.0000% | 0.0000% | 0.000000 |
+| Logistic regression | 0.952470 | 0.945306 | 88.4966% | 88.1183% | 85.9287% | 0.870097 |
+| Decision tree | 0.949041 | 0.939705 | 88.0242% | 86.9890% | 86.1783% | 0.865816 |
+| AdaBoost | **0.952684** | **0.945670** | **88.5393%** | **88.1322%** | 86.0216% | **0.870639** |
+| Random Forest | 0.951362 | 0.943743 | 88.3732% | 87.5988% | **86.2818%** | 0.869353 |
+
+### Fold-to-fold sample standard deviation
+
+SDs are on the 0–1 scale for all metrics (including accuracy, precision, and recall); they describe variation among these three folds and are not confidence intervals.
+
+| Model | ROC-AUC | Average precision | Accuracy | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Dummy | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 | 0.000000 |
+| Logistic regression | 0.000383 | 0.000274 | 0.000906 | 0.000947 | 0.001402 | 0.001061 |
+| Decision tree | 0.000352 | 0.000316 | 0.001077 | 0.000678 | 0.002479 | 0.001368 |
+| AdaBoost | 0.000368 | 0.000224 | 0.000510 | 0.002059 | 0.001628 | 0.000411 |
+| Random Forest | 0.000338 | 0.000076 | 0.000871 | 0.001138 | 0.000826 | 0.000956 |
+
+The dummy's tiny nonzero AP SD rounds to 0.000000. These are development-CV comparisons, not an independent final performance estimate; the holdout was not evaluated and unlabeled `test.csv` was not used. Small score differences do not establish a statistically meaningful winner. Source summaries: [`dummy_reference.json`](reports/dummy_reference.json), [`logistic_reference.json`](reports/logistic_reference.json), [`decision_tree_reference.json`](reports/decision_tree_reference.json), and the local generated summaries for [AdaBoost](reports/generated/adaboost/20261114T223109215876Z/summary.json) and [Random Forest](reports/generated/random_forest/20261115T130554382868Z/summary.json). Generated outputs are local/ignored and may not be present in a fresh clone.
 
 ## Status and next steps
 
