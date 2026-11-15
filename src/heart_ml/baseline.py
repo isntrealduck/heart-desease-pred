@@ -28,7 +28,7 @@ from .preprocess import build_pipeline
 from .features import FEATURE_DEFINITIONS, FEATURE_SETS
 from .split import encode_labels, write_or_verify_splits
 
-SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree")
+SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree", "adaboost")
 METRICS = ("roc_auc", "average_precision", "accuracy", "precision", "recall", "f1")
 
 
@@ -68,7 +68,7 @@ def evaluate_model(development, config, model_name, feature_set="original"):
     Probabilities, rather than thresholded labels, are used for ROC-AUC/AP.
     """
     if model_name not in SUPPORTED_MODELS:
-        raise ValueError("Supported models are dummy, logistic and decision_tree")
+        raise ValueError(f"Supported models are {', '.join(SUPPORTED_MODELS)}")
     if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
         raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     if not development["partition"].eq("development").all():
@@ -185,7 +185,7 @@ def run_baseline(config, model_name="dummy", output_dir=None, feature_set="origi
     """Verify/create saved splits and save a reproducible development-only run."""
     validate_config(config)
     if model_name not in SUPPORTED_MODELS:
-        raise ValueError("Supported models are dummy, logistic and decision_tree")
+        raise ValueError(f"Supported models are {', '.join(SUPPORTED_MODELS)}")
     if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
         raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     threads = config.get("threads", 1)

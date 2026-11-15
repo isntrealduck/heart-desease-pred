@@ -144,7 +144,20 @@ Measured reference: maximum depth 12, minimum leaf size 200, mean CV ROC-AUC **0
 
 See the [decision-tree report](reports/decision_tree.md), [full-precision summary](reports/decision_tree_reference.json), [all candidate results](reports/decision_tree_search_results.csv), and [verification evidence](reports/decision_tree_verification.json). To reproduce the selected settings without searching, use `--model decision_tree --config reports/decision_tree_selected_config.json` with the shared baseline command.
 
-The final report must label these scores development CV: eight configurations were compared on these folds, whereas logistic regression used fixed settings. These scores are not an independent final performance estimate.
+The final report must label tree scores as development CV: the eight tree configurations were compared on these folds, whereas logistic regression used fixed settings. These scores are not an independent final performance estimate.
+
+## AdaBoost experiment
+
+AdaBoost is available in the shared original-feature baseline and uses decision-tree stumps (scikit-learn's default depth-1 weak learner). Each round increases the influence of examples misclassified by earlier learners; `n_estimators` bounds rounds and training may stop early if a learner makes no errors. Numeric values are median-imputed, categorical codes are mode-imputed and one-hot encoded inside each fold; tree models are not scaled. The default is 50 estimators and learning rate 1.0. No SAMME.R or explicit estimator object is configured, preserving compatibility with the pinned scikit-learn API.
+
+Run the baseline or bounded six-candidate search:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model adaboost --config configs/default.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --config configs/default.json --plan configs/adaboost_search.json
+```
+
+The search crosses 25/50/100 estimators with learning rates 0.5/1.0, selects by mean ROC-AUC on the saved three development folds (ties: fewer estimators, then lower learning rate), and records candidate/fold metrics and warnings. It does not read the unlabeled test CSV or evaluate the holdout. Generated candidate outputs contain each development-fitted pipeline; `selected/` contains the selected pipeline and run outputs. Each candidate performs CV and a full-development refit; the selected run repeats CV and refits, so a full-data search can be expensive. This implementation has only been checked with synthetic smoke tests; no AdaBoost performance result is claimed until the full-data search is deliberately run.
 
 ## Status and next steps
 
