@@ -10,7 +10,7 @@
 - Keep `test.csv` unlabeled: generate predictions only, never local performance metrics from it.
 - Reserve a stratified 20% train holdout with seed 42; use shuffled 3-fold stratified CV with seed 42 on development data. Select by ROC-AUC, use threshold 0.5 for primary thresholded metrics, and never tune on the holdout.
 - Fit preprocessing within each fold using scikit-learn `Pipeline`/`ColumnTransformer`; do not leak validation or holdout information.
-- Keep scope bounded: dummy, logistic regression, decision tree, and teammate-led AdaBoost. HistGradientBoosting remains an optional constructor. Use small, recorded tuning only.
+- Keep scope bounded: dummy, logistic regression, decision tree, teammate-led AdaBoost, and the agreed Random Forest extension. HistGradientBoosting remains an optional constructor. Use small, recorded tuning only.
 - Persist holdout and fold membership by `id` alongside fixed configuration.
 - Save the entire fitted preprocessing-plus-model pipeline. Prediction must load it without retraining and use `classes_` to locate the positive-class probability.
 - Distinguish development CV from final holdout results. Any optional all-labeled-data refit is a separate artifact, not a newly evaluated model.

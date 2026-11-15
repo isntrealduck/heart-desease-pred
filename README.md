@@ -1,6 +1,6 @@
 # Heart disease classification project
 
-Implemented: input audit, saved ID-based split, shared pipeline constructors, tested dummy/logistic baselines, and a bounded development-only feature-engineering study, and a decision-tree search. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
+Implemented: input audit, saved ID-based split, shared pipeline constructors, tested dummy/logistic baselines, bounded feature and tree studies, and AdaBoost. A Random Forest baseline and optional bounded search are also available. **Final model selection, holdout evaluation, and test-file predictions are not implemented.** See the [dummy report](reports/dummy_baseline.md) and [logistic comparison report](reports/logistic_baseline.md) for measured reference results.
 
 ## Data and limitations
 
@@ -157,7 +157,25 @@ docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model ad
 docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --config configs/default.json --plan configs/adaboost_search.json
 ```
 
-The search crosses 25/50/100 estimators with learning rates 0.5/1.0, selects by mean ROC-AUC on the saved three development folds (ties: fewer estimators, then lower learning rate), and records candidate/fold metrics and warnings. It does not read the unlabeled test CSV or evaluate the holdout. Generated candidate outputs contain each development-fitted pipeline; `selected/` contains the selected pipeline and run outputs. Each candidate performs CV and a full-development refit; the selected run repeats CV and refits, so a full-data search can be expensive. This implementation has only been checked with synthetic smoke tests; no AdaBoost performance result is claimed until the full-data search is deliberately run.
+The search crosses 25/50/100 estimators with learning rates 0.5/1.0, selects by mean ROC-AUC on the saved three development folds (ties: fewer estimators, then lower learning rate), and records candidate/fold metrics and warnings. It does not read the unlabeled test CSV or evaluate the holdout. Generated candidate outputs contain each development-fitted pipeline; `selected/` contains the selected pipeline and run outputs. Each candidate performs CV and a full-development refit; the selected run repeats CV and refits, so a full-data search can be expensive. A separate fixed-default baseline was run on the full development set: mean ROC-AUC 0.952684, AP 0.945670, accuracy 88.5393%, precision 88.1322%, recall 86.0216%, F1 0.870639. This is not a tuned search result or holdout score; its saved summary is `reports/generated/adaboost/20261114T223109215876Z/summary.json`.
+
+## Random Forest: original-feature baseline and optional search
+
+The baseline uses a seeded 100-tree `RandomForestClassifier` (`max_depth=12`, `min_samples_leaf=50`, `max_features="sqrt"`) on the original 13 predictors. Numeric median imputation and categorical mode imputation/one-hot encoding are fitted within each fold; there is no scaling or feature engineering. `n_jobs` is derived from positive configured `threads` when omitted, and any supplied value must match (default 1); unbounded `-1` is rejected.
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model random_forest --config configs/default.json
+```
+
+The optional four-candidate search is explicitly opt-in:
+
+```sh
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.random_forest_experiment --config configs/default.json --plan configs/random_forest_search.json
+```
+
+It crosses depths 8/12 with leaf sizes 50/200 (100 trees fixed), selects mean development-fold ROC-AUC, and breaks exact ties toward shallower depth then larger leaves. CV evaluates four candidates (12 forest fits); selected baseline output repeats three folds and fits once on development data (4 more fits), for 16 forest fits total. Forests can be expensive and artifacts larger than the other models; the search is not run automatically. Outputs are development-only; no holdout is evaluated and test.csv is not read. No performance result is claimed until deliberately run.
+
+Baseline outputs default to `reports/generated/random_forest/<run-id>/`; search outputs default to `reports/generated/random-forest/<run-id>/`, with the selected run under `selected/`. Explicit output directories must be new. Search metadata records plan/config hashes and elapsed time; fold result rows retain warning notes.
 
 ## Status and next steps
 

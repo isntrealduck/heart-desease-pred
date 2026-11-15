@@ -1,8 +1,10 @@
 """Leakage-safe preprocessing and classifier construction."""
 
+from numbers import Integral
+
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyClassifier
-from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
@@ -14,6 +16,19 @@ from .audit import validate_config
 from .features import FEATURE_SETS, NumericFeatureEngineer
 
 
+def _random_forest_params(config):
+    """Resolve a bounded CPU worker count from the shared thread setting."""
+    threads = config.get("threads", 1)
+    if not isinstance(threads, Integral) or isinstance(threads, bool) or threads < 1:
+        raise ValueError("threads must be a positive integer")
+    params = dict(config["models"].get("random_forest", {}))
+    requested = params.get("n_jobs", threads)
+    if not isinstance(requested, Integral) or isinstance(requested, bool) or requested != threads:
+        raise ValueError("random_forest n_jobs must be a positive integer matching threads")
+    params["n_jobs"] = threads
+    return params
+
+
 def build_pipeline(model_name, config, feature_set="original"):
     """Return an unfitted pipeline; derived terms are logistic-only experiments."""
     validate_config(config)
@@ -23,7 +38,8 @@ def build_pipeline(model_name, config, feature_set="original"):
         raise ValueError("Derived features are supported only for logistic regression")
     numeric = config["numeric_features"]
     categorical = config["categorical_features"]
-    params = config["models"][model_name]
+    params = (_random_forest_params(config) if model_name == "random_forest"
+              else config["models"][model_name])
     if model_name == "dummy":
         return Pipeline([("model", DummyClassifier(strategy="prior"))])
     # Preserve the original path exactly; engineered variants keep all six
@@ -50,6 +66,8 @@ def build_pipeline(model_name, config, feature_set="original"):
         model = DecisionTreeClassifier(**params, random_state=config["seed"])
     elif model_name == "adaboost":
         model = AdaBoostClassifier(**params, random_state=config["seed"])
+    elif model_name == "random_forest":
+        model = RandomForestClassifier(**params, random_state=config["seed"])
     elif model_name == "hist_gradient_boosting":
         model = HistGradientBoostingClassifier(**params, random_state=config["seed"])
     else:

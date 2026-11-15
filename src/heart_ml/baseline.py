@@ -28,7 +28,7 @@ from .preprocess import build_pipeline
 from .features import FEATURE_DEFINITIONS, FEATURE_SETS
 from .split import encode_labels, write_or_verify_splits
 
-SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree", "adaboost")
+SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree", "adaboost", "random_forest")
 METRICS = ("roc_auc", "average_precision", "accuracy", "precision", "recall", "f1")
 
 
