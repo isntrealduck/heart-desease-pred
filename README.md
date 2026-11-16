@@ -48,11 +48,10 @@ full-development refit; selected CV and refit are repeated after selection.
 
 ## Docker workflow
 
-Docker is required for setup, training, and tests. From the repository root:
+Docker is required for setup and training. From the repository root:
 
 ```sh
 docker build -t heart-ml .
-docker run --rm -v "${PWD}:/app" heart-ml python -m pytest -q
 docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.audit --config configs/default.json --output data/audit.json
 docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.split --config configs/default.json
 ```

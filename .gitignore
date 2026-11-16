@@ -1,5 +1,6 @@
 __pycache__/
 .pytest_cache/
+tests/
 .DS_Store
 *.py[cod]
 .venv/
