@@ -16,6 +16,7 @@ CATEGORICAL = [
     "Sex", "Chest pain type", "FBS over 120", "EKG results",
     "Exercise angina", "Slope of ST", "Thallium",
 ]
+CURRENT_CATEGORICAL = [name for name in CATEGORICAL if name != "FBS over 120"]
 FEATURES = NUMERIC + CATEGORICAL
 ID = "id"
 TARGET = "Heart Disease"
@@ -39,13 +40,18 @@ def sha256(path):
 
 def validate_config(config):
     """Constrain role/schema declarations to the agreed dataset contract."""
-    expected_roles = {
-        "numeric_features": NUMERIC,
-        "categorical_features": CATEGORICAL,
+    legacy_numeric = NUMERIC
+    current_numeric = [name for name in NUMERIC if name != "BP"]
+    profiles = {
+        (tuple(legacy_numeric), tuple(CATEGORICAL)),
+        (tuple(current_numeric), tuple(CATEGORICAL)),
+        (tuple(current_numeric), tuple(CURRENT_CATEGORICAL)),
     }
-    for key, expected in expected_roles.items():
-        if config.get(key) != expected:
-            raise ValueError(f"Configuration {key} must match the fixed schema")
+    if (tuple(config.get("numeric_features", ())),
+            tuple(config.get("categorical_features", ()))) not in profiles:
+        raise ValueError(
+            "Configuration features must match a supported historical or current schema"
+        )
     data = config.get("data", {})
     if data.get("id") != ID or data.get("target") != TARGET:
         raise ValueError("Configuration id/target must match the fixed schema")

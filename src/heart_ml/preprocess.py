@@ -48,7 +48,9 @@ def build_pipeline(model_name, config, feature_set="original"):
         strategy="median", keep_empty_features=feature_set != "original"
     ))]
     if feature_set != "original":
-        numeric_steps.append(("engineer", NumericFeatureEngineer(feature_set)))
+        numeric_steps.append(("engineer", NumericFeatureEngineer(
+            feature_set, numeric_features=numeric
+        )))
     if model_name == "logistic":
         numeric_steps.append(("scale", StandardScaler()))
     numeric_pipe = Pipeline(numeric_steps)

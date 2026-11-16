@@ -54,7 +54,8 @@ def test_numeric_terms_are_correct_named_and_nonmutating(name, extra):
 
 
 def test_impute_then_engineer_then_scale_uses_training_medians(config):
-    training = pd.DataFrame({column: [1.0, 2.0, 3.0, 4.0] for column in NUMERIC})
+    numeric = config["numeric_features"]
+    training = pd.DataFrame({column: [1.0, 2.0, 3.0, 4.0] for column in numeric})
     training["Age"] = [2, 4, np.nan, 6]
     training["ST depression"] = [1, np.nan, 3, 5]
     for column in CATEGORICAL:
@@ -64,13 +65,15 @@ def test_impute_then_engineer_then_scale_uses_training_medians(config):
     assert list(numeric.named_steps) == ["impute", "engineer", "scale"]
     expected_age = np.array([2, 4, 4, 6], dtype=float)
     expected_st = np.array([1, 3, 3, 5], dtype=float)
-    engineered = numeric[:-1].transform(training[NUMERIC])
+    engineered = numeric[:-1].transform(training[config["numeric_features"]])
     np.testing.assert_array_equal(engineered[:, -2], expected_age ** 2)
     np.testing.assert_array_equal(engineered[:, -1], expected_age * expected_st)
     validation = training.iloc[:1].copy()
     validation["Age"] = np.nan
     validation["ST depression"] = 20
-    np.testing.assert_array_equal(numeric[:-1].transform(validation[NUMERIC])[:, -2:], [[16, 80]])
+    np.testing.assert_array_equal(
+        numeric[:-1].transform(validation[config["numeric_features"]])[:, -2:], [[16, 80]]
+    )
     np.testing.assert_allclose(numeric.named_steps["scale"].mean_, engineered.mean(axis=0))
 
 
@@ -85,7 +88,7 @@ def test_engineered_cv_keeps_fit_and_prediction_rows_disjoint(monkeypatch, confi
         def fit(self, X, y, **params):
             result = super().fit(X, y, **params)
             numeric = self.named_steps["preprocess"].named_transformers_["numeric"]
-            expected = numeric[:-1].transform(X[NUMERIC]).mean(axis=0)
+            expected = numeric[:-1].transform(X[config["numeric_features"]]).mean(axis=0)
             np.testing.assert_allclose(numeric.named_steps["scale"].mean_, expected)
             fits.append(set(X["Age"].astype(int)))
             return result

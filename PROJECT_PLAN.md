@@ -125,6 +125,12 @@ Generate 270,000 predictions for test.csv in original order. Use `classes_` to i
 
 An optional refit on all 630,000 labeled rows must produce a **separate** artifact. The existing holdout score belongs to the evaluated pipeline; the refitted model has no new untouched local test score.
 
+### Recorded, specifically authorized protocol amendment (16 Nov 2026)
+
+The team explicitly authorized one narrowly scoped second report on the existing 126,000-row labeled holdout: load (do not fit) the already development-trained AdaBoost pipeline with 65 depth-1 stumps, learning rate 1.1, seed 42, and the fixed 11-predictor schema excluding BP and FBS over 120. This reuses the holdout previously evaluated once for the 50-stump, 13-predictor artifact; consequently neither result is an independent validation of the other, and neither may be called an untouched final estimate. Preserve the original claim, summary, and artifact unchanged and disclose both results together.
+
+The amended run is separately claimed under the candidate's `selected/holdout_evaluation.json`, writes to `selected/authorized-second-holdout/`, and copies the pipeline and sidecars to `artifacts/authorized_second_holdout_65_1p1/`. Its specific authorization JSON is hash-bound to the candidate pipeline/config/metadata, training data, saved membership, and original completed claim/summary. It must verify the loaded model, classes, selectors, feature schema, source/split hashes, and exclusive claim before inference. It must not create or alter splits, train/refit/search, open `test.csv`, or overwrite the original artifact. This amendment is not generic permission to reuse the holdout: no further evaluation, model/feature/threshold selection, or tuning is permitted after this run. See README for recorded results and outputs.
+
 ## 9. Make the workflow runnable and document it - friend leads, both contribute
 
 Proposed structure; most files still need implementation:

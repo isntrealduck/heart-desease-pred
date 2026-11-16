@@ -118,7 +118,10 @@ def test_logistic_run_reuses_split_and_saves_full_pipeline(tmp_path, config, fra
     membership = pd.read_csv(membership_path)
     selected = frame["id"].isin(membership.loc[membership.partition == "development", "id"])
     scaler = pipeline.named_steps["preprocess"].named_transformers_["numeric"].named_steps["scale"]
-    np.testing.assert_allclose(scaler.mean_, frame.loc[selected, NUMERIC].mean().to_numpy())
+    numeric_features = config["numeric_features"]
+    np.testing.assert_allclose(
+        scaler.mean_, frame.loc[selected, numeric_features].mean().to_numpy()
+    )
     probability = pipeline.predict_proba(frame[features].iloc[:10])[:, 1]
     assert np.isfinite(probability).all() and np.ptp(probability) > 0
     assert (output / "development_predictions.csv").exists()

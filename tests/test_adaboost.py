@@ -51,7 +51,7 @@ def test_pipeline_handles_missing_numeric_and_unseen_categories():
     config = json.loads(open("configs/default.json").read())
     config["models"]["adaboost"]["n_estimators"] = 3
     columns = config["numeric_features"] + config["categorical_features"]
-    data = pd.DataFrame(np.arange(52).reshape(4, 13), columns=columns)
+    data = pd.DataFrame(np.arange(4 * len(columns)).reshape(4, len(columns)), columns=columns)
     data.loc[0, config["numeric_features"][0]] = np.nan
     y = [0, 1, 0, 1]
     pipeline = build_pipeline("adaboost", config).fit(data, y)

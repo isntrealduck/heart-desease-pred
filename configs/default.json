@@ -7,8 +7,8 @@
   "selection_metric": "roc_auc",
   "positive_label": "Presence",
   "negative_label": "Absence",
-  "numeric_features": ["Age", "BP", "Cholesterol", "Max HR", "ST depression", "Number of vessels fluro"],
-  "categorical_features": ["Sex", "Chest pain type", "FBS over 120", "EKG results", "Exercise angina", "Slope of ST", "Thallium"],
+  "numeric_features": ["Age", "Cholesterol", "Max HR", "ST depression", "Number of vessels fluro"],
+  "categorical_features": ["Sex", "Chest pain type", "EKG results", "Exercise angina", "Slope of ST", "Thallium"],
   "models": {
     "dummy": {},
     "decision_tree": {"criterion": "gini", "max_depth": 8, "min_samples_leaf": 50},
