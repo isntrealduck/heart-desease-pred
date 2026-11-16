@@ -37,7 +37,7 @@ The compact searches are configured in version control:
 | --- | --- |
 | Logistic regression | Fixed baseline: `C=1.0`, `max_iter=1000` |
 | Decision tree | Gini; `max_depth` 3, 8, 12 crossed with `min_samples_leaf` 50, 200 (6) |
-| AdaBoost stump count | `n_estimators` 25 through 75 by 5; `learning_rate=1.0` (11) |
+| AdaBoost stump count | `n_estimators` 45 through 75 by 5; `learning_rate=1.0` (7) |
 | AdaBoost learning rate | 65 estimators; learning rates 0.8, 0.9, 1.0, 1.1, 1.2 (5) |
 | Random Forest | `max_depth` 8, 12 crossed with `min_samples_leaf` 50, 200 (4); 100 trees, square-root feature sampling, one worker |
 
@@ -52,18 +52,18 @@ Docker is required for setup and training. From the repository root:
 
 ```sh
 docker build -t heart-ml .
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.audit --config configs/default.json --output data/audit.json
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.split --config configs/default.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.audit --config configs/default.json --output data/audit.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.split --config configs/default.json
 ```
 
 Development-only experiments:
 
 ```sh
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model logistic
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.tree_experiment --plan configs/decision_tree_search.json
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --plan configs/adaboost_stump_count_search.json
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --plan configs/adaboost_learning_rate_65_search.json
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.random_forest_experiment --plan configs/random_forest_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.baseline --model logistic
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.tree_experiment --plan configs/decision_tree_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.adaboost_experiment --plan configs/adaboost_stump_count_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.adaboost_experiment --plan configs/adaboost_learning_rate_65_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m src.random_forest_experiment --plan configs/random_forest_search.json
 ```
 
 For a fixed-configuration development CV run, `baseline --model` accepts only

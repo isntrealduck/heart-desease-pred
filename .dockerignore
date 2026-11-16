@@ -14,8 +14,6 @@ reports/
 results/
 plots/
 web/
-AGENTS.md
-CLAUDE.md
 .agents/
 .claude/
 .opencode/

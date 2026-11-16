@@ -6,4 +6,4 @@ RUN pip install --no-cache-dir -r requirements.lock
 COPY pyproject.toml .
 COPY src ./src
 RUN pip install --no-cache-dir -e .
-CMD ["python", "-m", "heart_ml.baseline", "--help"]
+CMD ["python", "-m", "src.baseline", "--help"]

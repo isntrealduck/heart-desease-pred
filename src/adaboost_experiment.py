@@ -11,8 +11,8 @@ from time import perf_counter
 import numpy as np
 import pandas as pd
 
-from .audit import validate_config
-from .baseline import run_baseline, write_json
+from src.audit import validate_config
+from src.baseline import run_baseline, write_json
 
 
 def candidates_from_plan(plan):

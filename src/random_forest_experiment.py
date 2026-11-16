@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 from threadpoolctl import threadpool_limits
 
-from .audit import sha256, validate_config, validate_csv
-from .baseline import METRICS, code_metadata, development_rows, evaluate_model, run_baseline, write_json
-from .split import write_or_verify_splits
+from src.audit import sha256, validate_config, validate_csv
+from src.baseline import METRICS, code_metadata, development_rows, evaluate_model, run_baseline, write_json
+from src.split import write_or_verify_splits
 
 
 def _thread_count(config):

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
-from .audit import ID, TARGET, sha256, validate_config, validate_csv
+from src.audit import ID, TARGET, sha256, validate_config, validate_csv
 
 PROTOCOL_KEYS = (
     "seed", "holdout_fraction", "folds", "positive_label", "negative_label",

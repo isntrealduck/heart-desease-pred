@@ -10,7 +10,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from .audit import validate_config
+from src.audit import validate_config
 
 
 def _random_forest_params(config):

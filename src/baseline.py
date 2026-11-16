@@ -23,9 +23,9 @@ from sklearn.metrics import (
 )
 from threadpoolctl import threadpool_limits
 
-from .audit import ID, TARGET, sha256, validate_config, validate_csv
-from .preprocess import build_pipeline
-from .split import encode_labels, write_or_verify_splits
+from src.audit import ID, TARGET, sha256, validate_config, validate_csv
+from src.preprocess import build_pipeline
+from src.split import encode_labels, write_or_verify_splits
 
 SUPPORTED_MODELS = ("logistic", "decision_tree", "adaboost", "random_forest")
 METRICS = ("roc_auc", "average_precision", "accuracy", "precision", "recall", "f1")

@@ -13,8 +13,6 @@ predictions/
 /train.csv
 /test.csv
 /DATA_MANIFEST.json
-AGENTS.md
-CLAUDE.md
 .agents/
 .claude/
 .opencode/
