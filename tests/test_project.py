@@ -84,6 +84,28 @@ def test_explicit_target_mapping(config):
     assert encode_labels(labels, config).tolist() == [0, 1]
 
 
+def test_submission_experiment_grids_are_exact():
+    with open("configs/decision_tree_search.json") as source:
+        tree = json.load(source)
+    assert tree["max_depth"] == [3, 8, 12]
+    assert tree["min_samples_leaf"] == [50, 200]
+    with open("configs/adaboost_stump_count_search.json") as source:
+        stumps = json.load(source)
+    assert stumps["n_estimators"] == list(range(25, 76, 5))
+    assert stumps["learning_rate"] == [1.0]
+    with open("configs/adaboost_learning_rate_65_search.json") as source:
+        rates = json.load(source)
+    assert rates["n_estimators"] == [65]
+    assert rates["learning_rate"] == [0.8, 0.9, 1.0, 1.1, 1.2]
+    with open("configs/random_forest_search.json") as source:
+        forest = json.load(source)
+    assert forest["max_depth"] == [8, 12]
+    assert forest["min_samples_leaf"] == [50, 200]
+    assert forest["n_estimators"] == 100
+    assert forest["max_features"] == "sqrt"
+    assert json.loads(open("configs/default.json").read())["threads"] == 1
+
+
 def test_pipeline_is_cloneable_unfitted_and_predicts_unseen_codes(config):
     frame = synthetic_frame(config)
     X = frame[config["numeric_features"] + config["categorical_features"]]

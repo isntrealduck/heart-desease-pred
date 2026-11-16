@@ -102,7 +102,6 @@ def test_logistic_run_reuses_split_and_saves_full_pipeline(tmp_path, config, fra
     metadata = json.loads((output / "run_metadata.json").read_text())
     assert metadata["status"] == "completed"
     assert metadata["model"] == summary["model"] == "logistic"
-    assert metadata["feature_set"] == "original"
     assert metadata["split_created"] is False
     assert metadata["holdout_evaluated"] is False
     assert metadata["test_csv_used"] is False
@@ -125,7 +124,6 @@ def test_logistic_run_reuses_split_and_saves_full_pipeline(tmp_path, config, fra
     probability = pipeline.predict_proba(frame[features].iloc[:10])[:, 1]
     assert np.isfinite(probability).all() and np.ptp(probability) > 0
     assert (output / "development_predictions.csv").exists()
-    assert not (output / "dummy_pipeline.joblib").exists()
 
 
 def test_convergence_warnings_are_retained(config, frame):

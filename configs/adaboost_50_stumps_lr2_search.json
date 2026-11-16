@@ -1,6 +1,0 @@
-{
-  "selection_metric": "roc_auc",
-  "tie_break": "fewer estimators, then lower learning rate",
-  "n_estimators": [50],
-  "learning_rate": [2.0]
-}

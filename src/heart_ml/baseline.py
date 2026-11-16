@@ -25,10 +25,9 @@ from threadpoolctl import threadpool_limits
 
 from .audit import ID, TARGET, sha256, validate_config, validate_csv
 from .preprocess import build_pipeline
-from .features import FEATURE_DEFINITIONS, FEATURE_SETS
 from .split import encode_labels, write_or_verify_splits
 
-SUPPORTED_MODELS = ("dummy", "logistic", "decision_tree", "adaboost", "random_forest")
+SUPPORTED_MODELS = ("logistic", "decision_tree", "adaboost", "random_forest")
 METRICS = ("roc_auc", "average_precision", "accuracy", "precision", "recall", "f1")
 
 
@@ -54,14 +53,7 @@ def development_rows(frame, membership, config):
     return development
 
 
-def _feature_pipeline(model_name, config, feature_set):
-    # Retain the two-argument builder API for existing baseline callers/tests.
-    if feature_set == "original":
-        return build_pipeline(model_name, config)
-    return build_pipeline(model_name, config, feature_set=feature_set)
-
-
-def evaluate_model(development, config, model_name, feature_set="original"):
+def evaluate_model(development, config, model_name):
     """Return per-fold results and out-of-fold development predictions.
 
     Each fold fits a fresh complete pipeline, including learned preprocessing.
@@ -69,8 +61,6 @@ def evaluate_model(development, config, model_name, feature_set="original"):
     """
     if model_name not in SUPPORTED_MODELS:
         raise ValueError(f"Supported models are {', '.join(SUPPORTED_MODELS)}")
-    if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
-        raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     if not development["partition"].eq("development").all():
         raise ValueError("Only development rows may enter baseline evaluation")
     threshold = config["threshold"]
@@ -91,7 +81,7 @@ def evaluate_model(development, config, model_name, feature_set="original"):
         if y.loc[training].nunique() != 2 or y.loc[validation].nunique() != 2:
             raise ValueError(f"Fold {fold}: training and validation need both classes")
         started = perf_counter()
-        pipeline = _feature_pipeline(model_name, config, feature_set)
+        pipeline = build_pipeline(model_name, config)
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             pipeline.fit(X.loc[training], y.loc[training])
@@ -109,8 +99,7 @@ def evaluate_model(development, config, model_name, feature_set="original"):
         if not predicted.any():
             notes.append("No positive predictions; undefined precision is reported as 0.")
         results.append({
-            "model": model_name, "strategy": "prior" if model_name == "dummy" else "",
-            "feature_set": feature_set,
+            "model": model_name,
             "fold": fold,
             "training_rows": int(training.sum()), "validation_rows": int(validation.sum()),
             "training_positive_fraction": float(y.loc[training].mean()),
@@ -130,11 +119,6 @@ def evaluate_model(development, config, model_name, feature_set="original"):
     predictions["probability_presence"] = probabilities
     predictions["predicted_label"] = (probabilities >= threshold).astype("int8")
     return pd.DataFrame(results), predictions
-
-
-def evaluate_dummy(development, config):
-    """Preserve the original dummy-only API while sharing evaluation logic."""
-    return evaluate_model(development, config, "dummy")
 
 
 def code_metadata():
@@ -181,13 +165,11 @@ def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def run_baseline(config, model_name="dummy", output_dir=None, feature_set="original"):
+def run_baseline(config, model_name="logistic", output_dir=None):
     """Verify/create saved splits and save a reproducible development-only run."""
     validate_config(config)
     if model_name not in SUPPORTED_MODELS:
         raise ValueError(f"Supported models are {', '.join(SUPPORTED_MODELS)}")
-    if feature_set not in FEATURE_SETS or (feature_set != "original" and model_name != "logistic"):
-        raise ValueError("Unknown feature set, or derived features requested for a non-logistic model")
     threads = config.get("threads", 1)
     if not isinstance(threads, int) or isinstance(threads, bool) or threads < 1:
         raise ValueError("threads must be a positive integer")
@@ -197,8 +179,7 @@ def run_baseline(config, model_name="dummy", output_dir=None, feature_set="origi
     output.mkdir(parents=True, exist_ok=False)
     metadata = {
         "run_id": run_id, "status": "running", "evaluation": "development_cross_validation",
-        "model": model_name, "strategy": "prior" if model_name == "dummy" else None,
-        "feature_set": feature_set, "feature_definitions": FEATURE_DEFINITIONS[feature_set],
+        "model": model_name,
         "configured_parameters": config["models"][model_name],
         "threshold": config["threshold"],
         "positive_class": 1, "threshold_rule": "probability_presence >= threshold",
@@ -224,13 +205,11 @@ def run_baseline(config, model_name="dummy", output_dir=None, feature_set="origi
                 "split_created": created, "development_rows": len(development),
                 "holdout_rows_excluded": len(frame) - len(development),
             })
-            folds, predictions = evaluate_model(development, config, model_name, feature_set=feature_set)
+            folds, predictions = evaluate_model(development, config, model_name)
             folds.to_csv(output / "cv_results.csv", index=False)
             predictions.to_csv(output / "development_predictions.csv", index=False)
             summary = {
                 "evaluation": "development_cross_validation", "model": model_name,
-                "strategy": "prior" if model_name == "dummy" else None,
-                "feature_set": feature_set, "feature_definitions": FEATURE_DEFINITIONS[feature_set],
                 "configured_parameters": config["models"][model_name],
                 "folds": len(folds), "threshold": config["threshold"],
                 "development_rows": len(development),
@@ -242,7 +221,7 @@ def run_baseline(config, model_name="dummy", output_dir=None, feature_set="origi
             }
             write_json(output / "summary.json", summary)
             # This is a development-trained baseline, not a holdout-evaluated final model.
-            pipeline = _feature_pipeline(model_name, config, feature_set)
+            pipeline = build_pipeline(model_name, config)
             features = config["numeric_features"] + config["categorical_features"]
             with warnings.catch_warnings(record=True) as final_warnings:
                 warnings.simplefilter("always")
@@ -268,23 +247,15 @@ def run_baseline(config, model_name="dummy", output_dir=None, feature_set="origi
     return output, summary
 
 
-def run_dummy_baseline(config, output_dir=None):
-    """Keep existing callers and the default dummy command working."""
-    return run_baseline(config, model_name="dummy", output_dir=output_dir)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", choices=SUPPORTED_MODELS, default="dummy")
-    parser.add_argument("--feature-set", choices=FEATURE_SETS, default="original")
+    parser.add_argument("--model", choices=SUPPORTED_MODELS, default="logistic")
     parser.add_argument("--config", default="configs/default.json")
     parser.add_argument("--output-dir", help="New output directory; existing directories are never overwritten")
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
-    output, summary = run_baseline(
-        config, model_name=args.model, output_dir=args.output_dir, feature_set=args.feature_set
-    )
-    print(f"{args.model.capitalize()} / {args.feature_set}: development cross-validation only")
+    output, summary = run_baseline(config, model_name=args.model, output_dir=args.output_dir)
+    print(f"{args.model.capitalize()}: development cross-validation only")
     for metric, values in summary["metrics"].items():
         print(f"{metric}: {values['mean']:.6f} (fold SD {values['fold_sd']:.6f})")
     print(f"Saved results and development-trained pipeline to {output}")

@@ -22,10 +22,10 @@ def test_adaboost_pipeline_is_cloneable_and_uses_stumps():
 
 
 def test_candidate_validation_and_deterministic_tie_break():
-    plan = json.loads(open("configs/adaboost_search.json").read())
-    assert len(candidates_from_plan(plan)) == 6
-    with pytest.raises(ValueError, match="At most eight"):
-        candidates_from_plan({**plan, "n_estimators": [1, 2, 3, 4, 5]})
+    plan = json.loads(open("configs/adaboost_stump_count_search.json").read())
+    assert len(candidates_from_plan(plan)) == 11
+    with pytest.raises(ValueError, match="At most eleven"):
+        candidates_from_plan({**plan, "n_estimators": list(range(1, 13))})
     table = pd.DataFrame([
         {"roc_auc_mean": .8, "n_estimators": 50, "learning_rate": .5},
         {"roc_auc_mean": .8, "n_estimators": 25, "learning_rate": 1.0},
@@ -35,14 +35,14 @@ def test_candidate_validation_and_deterministic_tie_break():
 
 @pytest.mark.parametrize("counts", [[0], [-1], [True], [1, 1]])
 def test_invalid_estimator_counts_rejected(counts):
-    plan = json.loads(open("configs/adaboost_search.json").read())
+    plan = json.loads(open("configs/adaboost_stump_count_search.json").read())
     with pytest.raises(ValueError):
         candidates_from_plan({**plan, "n_estimators": counts})
 
 
 @pytest.mark.parametrize("rates", [[0], [-0.1], [True], [float("nan")], [float("inf")], [0.5, 0.5]])
 def test_invalid_learning_rates_rejected(rates):
-    plan = json.loads(open("configs/adaboost_search.json").read())
+    plan = json.loads(open("configs/adaboost_stump_count_search.json").read())
     with pytest.raises(ValueError):
         candidates_from_plan({**plan, "learning_rate": rates})
 

@@ -46,8 +46,8 @@ def candidates_from_plan(plan):
         {"n_estimators": n, "learning_rate": rate}
         for n, rate in itertools.product(counts, rates)
     ]
-    if len(candidates) > 8:
-        raise ValueError("At most eight AdaBoost candidates are allowed")
+    if len(candidates) > 11:
+        raise ValueError("At most eleven AdaBoost candidates are allowed")
     return candidates
 
 
@@ -121,7 +121,7 @@ def run_search(config, plan, output_dir=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="configs/default.json")
-    parser.add_argument("--plan", default="configs/adaboost_search.json")
+    parser.add_argument("--plan", default="configs/adaboost_stump_count_search.json")
     parser.add_argument("--output-dir")
     args = parser.parse_args()
     output, result = run_search(json.loads(Path(args.config).read_text()),

@@ -14,7 +14,7 @@ from heart_ml.tree_experiment import candidates_from_plan, run_search, select_ca
 
 def test_plan_validation_and_exact_ties():
     plan = json.loads(open("configs/decision_tree_search.json").read())
-    assert len(candidates_from_plan(plan)) == 8
+    assert len(candidates_from_plan(plan)) == 6
     for bad in ([0], [True], [3, 3], []):
         with pytest.raises(ValueError):
             candidates_from_plan({**plan, "max_depth": bad})

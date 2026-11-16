@@ -1,128 +1,87 @@
 # Heart-disease label classification
 
-This project compares simple machine-learning models for predicting the supplied
-`Heart Disease` label (`Absence` or `Presence`). It is a coursework experiment,
-not a clinical tool. The provenance of the local data is unconfirmed, so results
-do not establish clinical validity, patient-level generalization, diagnosis, or
-future risk.
+Coursework comparing four classifiers for the supplied `Heart Disease` label:
+logistic regression, a decision tree, AdaBoost, and Random Forest. This is a
+classification experiment, not a clinical tool. Data provenance is unconfirmed;
+the task does not establish diagnosis, future risk, or patient-level validity.
 
-## Data and protocol
+## Data
 
-Place the supplied files at `data/raw/train.csv` and `data/raw/test.csv`.
-Preserve the originals. The files appear consistent with Kaggle Playground
-Series S6E2, but that identification and its access/redistribution terms have
-not been verified. `test.csv` is unlabeled; no local metrics are computed from
-it, and batch prediction for it is not implemented.
+Place the labeled file at `data/raw/train.csv`. It must contain, in order,
+`id`, `Age`, `Sex`, `Chest pain type`, `BP`, `Cholesterol`, `FBS over 120`,
+`EKG results`, `Max HR`, `Exercise angina`, `ST depression`, `Slope of ST`,
+`Number of vessels fluro`, `Thallium`, and `Heart Disease`. Labels are exactly
+`Absence` and `Presence`. The current model uses 11 predictors: it excludes
+`id`, `BP`, and `FBS over 120`; labels are mapped explicitly to 0 and 1.
+Preserve supplied CSV originals. Data appear consistent with Kaggle Playground
+Series S6E2, but source and redistribution terms are unverified.
 
-The saved split reserves 20% of labeled training rows (126,000) as a
-stratified holdout (seed 42); shuffled stratified three-fold CV (seed 42) uses
-the other 504,000 development rows. `id` is excluded from predictors, and the
-target is explicitly mapped `Absence=0`, `Presence=1`. Preprocessing is part
-of each scikit-learn pipeline and is fitted within training folds. Models are
-compared by ROC-AUC; thresholded metrics use 0.5. Split and fold membership
-are persisted by ID. The current `configs/default.json` uses 11 predictors,
-excluding BP and FBS over 120. The historical CV comparison below used the
-original 13 predictors; do not conflate those feature schemas.
+`test.csv` is not needed or used. It is unlabeled and this project does not
+produce batch predictions or local metrics from it.
 
-## Recorded results
+## Protocol and models
 
-Historical development-CV snapshot: unweighted means across the same three
-development folds. Thresholded metrics use 0.5. AdaBoost and Random Forest are
-fixed-default runs; the tree is the winner of a bounded search. These
-comparisons are not independent estimates, and small differences do not
-establish a meaningful winner.
+Use a stratified 20% holdout (seed 42) and shuffled stratified 3-fold CV
+(seed 42) on the remaining development data. The holdout is excluded from all
+experiments below. Candidate selection uses mean fold ROC-AUC; other recorded
+metrics include average precision and thresholded metrics at 0.5. Imputation,
+scaling (logistic regression), and categorical one-hot encoding are inside
+scikit-learn pipelines fitted separately within each training fold. Split and
+fold membership are stored by ID. The prior holdout has already been used for
+two authorized evaluations and is consumed: do not evaluate it again or use it
+to select models/settings. These workflows are development-only.
 
-| Model (13-feature historical comparison) | ROC-AUC | AP | Accuracy | Precision | Recall | F1 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Dummy | 0.500000 | 0.448339 | 55.1661% | 0.0000% | 0.0000% | 0.000000 |
-| Logistic regression | 0.952470 | 0.945306 | 88.4966% | 88.1183% | 85.9287% | 0.870097 |
-| Decision tree | 0.949041 | 0.939705 | 88.0242% | 86.9890% | 86.1783% | 0.865816 |
-| AdaBoost | **0.952684** | **0.945670** | **88.5393%** | **88.1322%** | 86.0216% | **0.870639** |
-| Random Forest | 0.951362 | 0.943743 | 88.3732% | 87.5988% | **86.2818%** | 0.869353 |
+The compact searches are configured in version control:
 
-Two AdaBoost evaluations reused the **same 126,000-row holdout** under a
-specifically authorized protocol amendment. They are not independent of one
-another; neither demonstrates superiority or provides an untouched final
-estimate. The holdout is consumed: no further holdout evaluation, tuning, or
-selection is permitted.
+| Experiment | Candidates |
+| --- | --- |
+| Logistic regression | Fixed baseline: `C=1.0`, `max_iter=1000` |
+| Decision tree | Gini; `max_depth` 3, 8, 12 crossed with `min_samples_leaf` 50, 200 (6) |
+| AdaBoost stump count | `n_estimators` 25 through 75 by 5; `learning_rate=1.0` (11) |
+| AdaBoost learning rate | 65 estimators; learning rates 0.8, 0.9, 1.0, 1.1, 1.2 (5) |
+| Random Forest | `max_depth` 8, 12 crossed with `min_samples_leaf` 50, 200 (4); 100 trees, square-root feature sampling, one worker |
 
-| Frozen artifact | Predictors / configuration | ROC-AUC | AP | Accuracy | Precision | Recall | F1 |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Original evaluation | 13; 50 stumps, learning rate 1.0 | 0.953487 | 0.946431 | 88.6778% | 88.3494% | 86.1004% | 0.872104 |
-| Authorized second look | 11 (BP/FBS excluded); 65 stumps, learning rate 1.1 | 0.953863 | 0.946891 | 88.6849% | 88.4967% | 85.9323% | 0.871957 |
+AdaBoost uses decision stumps. Selection ties prefer fewer estimators then
+lower learning rate; tree ties prefer shallower depth then larger leaf size.
+The two AdaBoost grids are separate experiments. Each candidate runs CV and a
+full-development refit; selected CV and refit are repeated after selection.
 
-Both used threshold 0.5 and loaded already-fitted development pipelines; there
-was no holdout fitting. Score differences are not evidence of independent
-generalization or established superiority. Detailed precision, confusion
-counts, provenance, authorization record, experiment methods, and historical
-commands are in [docs/experiments.md](docs/experiments.md). The specifically
-authorized second-evaluation files are:
+## Docker workflow
 
-- Authorization and exclusive claim:
-  `reports/generated/adaboost_search/20261116T105636099417Z/selected/second_holdout_authorization.json`
-  and sibling `holdout_evaluation.json`.
-- Output: `reports/generated/adaboost_search/20261116T105636099417Z/selected/authorized-second-holdout/`.
-- Copied pipeline: `artifacts/authorized_second_holdout_65_1p1/evaluated_pipeline.joblib`.
-- Original evaluation and artifact:
-  `reports/generated/adaboost/20261114T223109215876Z/holdout_evaluation.json`,
-  `reports/generated/adaboost/20261114T223109215876Z/holdout-result/summary.json`,
-  `artifacts/evaluated_pipeline.joblib`.
-
-These outputs/artifacts are local and git-ignored. `PROJECT_PLAN.md` records
-the authorization amendment and its safeguards. Do not rerun either evaluator.
-The static `web/results.json` is intentionally a historical display snapshot
-of the original-model CV and original holdout; it is not the second-look
-result and must not be silently relabeled.
-
-## Docker: build, tests, audit, and split
-
-Docker is required for project workflows. Run at the repository root:
+Docker is required for setup, training, and tests. From the repository root:
 
 ```sh
 docker build -t heart-ml .
 docker run --rm -v "${PWD}:/app" heart-ml python -m pytest -q
-docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.audit --config configs/default.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.audit --config configs/default.json --output data/audit.json
 docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.split --config configs/default.json
 ```
 
-Data files, generated split files, and fitted artifacts are not committed.
-See [docs/experiments.md](docs/experiments.md) for the fuller command reference,
-experiment details, and output interpretation.
-
-## Results page and local prediction demo
-
-The static results page is informational only:
+Development-only experiments:
 
 ```sh
-docker run --rm -p 8000:8000 -v "${PWD}/web:/site:ro" -w /site heart-ml \
-  python -m http.server 8000 --bind 0.0.0.0
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.baseline --model logistic
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.tree_experiment --plan configs/decision_tree_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --plan configs/adaboost_stump_count_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.adaboost_experiment --plan configs/adaboost_learning_rate_65_search.json
+docker run --rm -v "${PWD}:/app" heart-ml python -m heart_ml.random_forest_experiment --plan configs/random_forest_search.json
 ```
 
-Visit <http://localhost:8000>. For the single-record form, stop that server and
-run the local frozen-pipeline demo instead:
+For a fixed-configuration development CV run, `baseline --model` accepts only
+`logistic`, `decision_tree`, `adaboost`, or `random_forest`. All commands use
+`configs/default.json` unless overridden. Run a baseline or search only when
+the labeled training file is available; none requires `test.csv`.
 
-```sh
-docker run --rm -p 127.0.0.1:8000:8000 -v "${PWD}:/app" heart-ml \
-  python -m heart_ml.predict_web
-```
+Runs and generated split membership are written locally under ignored
+`reports/` and `data/splits/` paths. Experiment output includes configuration,
+fold metrics/predictions, metadata, and a fitted development pipeline.
+Generated outputs and data are not submission files and should not be
+committed.
 
-It loads `artifacts/evaluated_pipeline.joblib` (the original 50-stump,
-13-feature evaluation artifact), without fitting or changing it. The form
-accepts the current 11 inputs and supports legacy schemas only after checks
-that excluded features are unused. The 65-stump alternative can be selected
-with `HEART_ML_PIPELINE=artifacts/authorized_second_holdout_65_1p1/evaluated_pipeline.joblib`
-when that local artifact is available; the environment override changes no
-artifact and does not authorize another evaluation. Do not use this demo for
-health decisions. Batch `test.csv` prediction remains unimplemented.
+## Limitations
 
-## Reports and limitations
-
-- [Dummy baseline](reports/dummy_baseline.md)
-- [Logistic comparison](reports/logistic_baseline.md)
-- [Decision-tree report](reports/decision_tree.md)
-- [Detailed experiment and holdout record](docs/experiments.md)
-
-Development CV is not independent final evaluation; fold variability is not a
-confidence interval. The two holdout results reuse one partition. Data
-provenance, clinical interpretation, patient identity, and row independence
-remain unverified. The results support no clinical claim.
+Development CV scores are selection estimates, not independent final
+performance; fold standard deviation is not a confidence interval. The
+previously used holdout is consumed and is not part of reproducible workflows
+in this submission. Data source, patient identity, row independence, and
+clinical interpretation remain unverified. No clinical claims are made.

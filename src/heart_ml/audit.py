@@ -150,12 +150,9 @@ def main():
     with open(args.config) as config_file:
         config = json.load(config_file)
     validate_config(config)
-    reports = {
-        name: audit(config["data"][name], name == "train")
-        for name in ("train", "test")
-    }
+    reports = {"train": audit(config["data"]["train"], True)}
     Path(args.output).write_text(json.dumps({
-        "provenance": "unverified; candidate source noted in PROJECT_PLAN.md",
+        "provenance": "unverified; see README.md for the tentative dataset identification",
         "reports": reports,
     }, indent=2) + "\n")
     print(f"Wrote {args.output}")
